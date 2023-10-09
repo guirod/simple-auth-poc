@@ -1,4 +1,4 @@
 <?php
 session_start();
-$_SESSION['authentified'] = false;
+unset($_SESSION['user']);
 header('location: connexion.php');
