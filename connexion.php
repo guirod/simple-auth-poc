@@ -1,6 +1,10 @@
 <?php
+include_once("./Model/Connexion.php");
+include_once("./Model/User.php");
+
 session_start();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,9 +16,10 @@ session_start();
 
 <body>
     <?php
-    if (isset($_SESSION['authentified']) && $_SESSION['authentified'] === true) {
+    if (isset($_SESSION['user'])) {
+        $user2 = unserialize(base64_decode($_SESSION['user']));
         ?>
-
+        
         <h3>Vous êtes déjà connecté</h3>
 
         <p><a href="logout.php">Se déconnecter</a></p>
@@ -36,11 +41,7 @@ session_start();
 
         <?php
         if (!empty($_POST['email']) && !empty($_POST['password'])) {
-            $servername = "docker-lamp-mysql";
-            $username = "root";
-            $password = "p@ssw0rd";
-            $dbname = 'users_management';
-            $conn = null;
+            $conn = Connexion::getInstance()->getConn();
 
             /*
              * Création du hash du password qui sera sauvegardé en BDD. On ne sauvegarde jamais les password en clair
@@ -55,22 +56,24 @@ session_start();
             $userPassword = $_POST['password'];
 
             try {
-                $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-                $stt = $conn->prepare("SELECT password_hash FROM `users` WHERE `login` = ?");
+                $stt = $conn->prepare("SELECT * FROM `users` WHERE `login` = ?");
                 $stt->bindParam(1, $email);
                 $stt->execute();
 
                 $dbhash = null;
+                $userArray = [];
                 if ($stt->rowCount() === 1) {
-                    $dbhash = $stt->fetch()['password_hash'];
+                    $userArray = $stt->fetch();
+                    $dbhash = $userArray['password_hash'];
                 }
 
                 if (password_verify($userPassword, $dbhash)) {
-                    echo "Connecté";
-                    $_SESSION['authentified'] = true;
+                    // $_SESSION['authentified'] = true;
+                    $user = User::hydrate($userArray);
+
+                    $_SESSION['user'] = base64_encode(serialize($user));
+
+                    $user2 = unserialize(base64_decode($_SESSION['user']));
                     header('location: connexion.php');
                 }
             } catch (PDOException $e) {
