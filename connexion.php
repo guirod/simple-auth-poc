@@ -1,6 +1,8 @@
 <?php
-include_once("./Model/Connexion.php");
-include_once("./Model/User.php");
+include_once "simple_autoload.php";
+
+use Model\Connexion;
+use Model\User;
 
 session_start();
 ?>
@@ -17,10 +19,14 @@ session_start();
 <body>
     <?php
     if (isset($_SESSION['user'])) {
-        $user2 = unserialize(base64_decode($_SESSION['user']));
+        /**@var User */
+        $user = unserialize(base64_decode($_SESSION['user']));
+        var_dump($user->getGroups());
         ?>
         
         <h3>Vous êtes déjà connecté</h3>
+
+        
 
         <p><a href="logout.php">Se déconnecter</a></p>
         <?php

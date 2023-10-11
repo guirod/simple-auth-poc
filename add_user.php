@@ -1,5 +1,7 @@
 <?php
-include_once("./Model/User.php");
+include_once "simple_autoload.php";
+
+use Model\User;
 
 session_start();
 ?>

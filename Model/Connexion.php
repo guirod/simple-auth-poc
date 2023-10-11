@@ -1,5 +1,7 @@
 <?php
 
+namespace Model;
+
 class Connexion
 {
     const SERVER_NAME = "docker-lamp-mysql";
@@ -9,14 +11,14 @@ class Connexion
 
     private static $instance = NULL;
     
-    private ?PDO $conn = null; 
+    private ?\PDO $conn = null; 
 
     static public function getInstance()
     {
         if (self::$instance === NULL) {
             try {
                 self::$instance = new Connexion();
-            } catch (PDOException $e) {
+            } catch (\PDOException $e) {
                 echo $e->getMessage();
             }
         }
@@ -29,12 +31,12 @@ class Connexion
      */
     protected function __construct()
     {
-        $this->conn = new PDO("mysql:host=". self::SERVER_NAME .";dbname=".self::DB_NAME, self::USERNAME, self::PASSWORD);
-        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $this->conn = new \PDO("mysql:host=". self::SERVER_NAME .";dbname=".self::DB_NAME, self::USERNAME, self::PASSWORD);
+        $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->conn->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
     }
 
-    public function getConn(): PDO
+    public function getConn(): \PDO
     {
         return $this->conn;
     }

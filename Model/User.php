@@ -1,12 +1,15 @@
 <?php
-include_once('./Model/Connexion.php');
-include_once('./Model/Group.php');
+
+namespace Model;
+
+use Model\Connexion;
+
 class User
 {
     private int $id;
     private string $login;
     private string $passwordHash;
-    private ?Group $group = null;
+    private ?array $groups = null;
 
 
 
@@ -19,30 +22,37 @@ class User
         return $this->login;
     }
 
-    public function getGroup(): Group
+    public function addGroup(Group $group): User
     {
-        if($this->group === null) {
+        $this->groups[] = $group;
+
+        return $this;
+    }
+
+    public function removeGroup(Group $group): User
+    {
+        return $this;
+    }
+
+    public function getGroups(): array
+    {
+        if($this->groups === null) {
             $conn = Connexion::getInstance()->getConn();
-            $sql = "SELECT * FROM `groups` g
+            $sql = "SELECT g.* FROM `groups` g
                     INNER JOIN users_groups ug ON g.id = ug.id_group
                     INNER JOIN users u ON u.id = ug.id_user  
                     WHERE u.id = ?";
             
-            $stt = $conn->prepare("SELECT * FROM `users` WHERE `login` = ?");
-                $stt->bindParam(1, $this->id, PDO::PARAM_INT);
+            $stt = $conn->prepare($sql);
+                $stt->bindParam(1, $this->id, \PDO::PARAM_INT);
                 $stt->execute();
 
-                $dbhash = null;
-                $userArray = [];
-                if ($stt->rowCount() === 1) {
-                    $userArray = $stt->fetch();
-                    $dbhash = $userArray['password_hash'];
+                while ($arrayGroup = $stt->fetch()) {
+                    $this->addGroup(Group::hydrate($arrayGroup));
                 }
-            // TODO Requete sql
-            // $this->group = ...
         }
 
-        return $this->group;
+        return $this->groups;
     }
 
     public function getId(): int
@@ -93,7 +103,7 @@ class User
             $stt->execute();
             $this->id = $conn->lastInsertId();
 
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             echo $e->getMessage();
         }
     }
@@ -107,5 +117,10 @@ class User
             ->setPasswordHash($properties['password_hash']);
         
         return $user;
+    }
+
+    public function findById(int $id): User
+    {
+        return new User();
     }
 }
