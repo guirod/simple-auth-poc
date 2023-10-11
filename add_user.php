@@ -48,6 +48,8 @@ session_start();
         $user->setPasswordHash($hash);
         $user->save();
 
+        //Envoi de mail de confirmation à l'utilisateur
+        
 
     }
     ?>

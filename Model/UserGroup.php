@@ -11,6 +11,12 @@ class UserGroup
     private int $idGroup;
     private int $idUser;
 
+    public function __construct(int $idUser, int $idGroup)
+    {
+        $this->idUser = $idUser;
+        $this->idGroup = $idGroup;
+    }
+
     public function getIdGroup()
     {
         return $this->idGroup;

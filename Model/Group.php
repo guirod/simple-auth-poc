@@ -4,6 +4,8 @@ namespace Model;
 
 class Group
 {
+    const GROUP_ADMIN = 'Admin';
+    const GROUP_MEMBER = 'Member';
     private int $id;
     private string $name;
 
@@ -63,8 +65,21 @@ class Group
         }
     }
 
-    public function findByName(string $name): Group
+    public static function findByName(string $name): ?Group
     {
-        return new Group();
+        $group = null;
+
+        try {
+            $conn = Connexion::getInstance()->getConn();
+            $stt = $conn->prepare("SELECT * FROM `groups` WHERE `name` = ?");
+            $stt->bindParam(1, $name);
+            $stt->execute();
+            $group = self::hydrate($stt->fetch());
+
+        } catch (\PDOException $e) {
+            echo $e->getMessage();
+        }
+        
+        return $group; 
     }
 }

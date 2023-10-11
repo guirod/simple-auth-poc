@@ -103,6 +103,11 @@ class User
             $stt->execute();
             $this->id = $conn->lastInsertId();
 
+            // Add the user in the member group & insert a users_groups entry 
+            // Get member group : 
+            $memberGroup = Group::findByName('Member');
+            $userGroup = new UserGroup($this->id, $memberGroup->getId());
+            $userGroup->save();
         } catch (\PDOException $e) {
             echo $e->getMessage();
         }
@@ -122,5 +127,16 @@ class User
     public function findById(int $id): User
     {
         return new User();
+    }
+
+    public function isAdmin():bool
+    {
+        foreach($this->getGroups() as $group) {
+            if ($group->getName() === Group::GROUP_ADMIN) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
