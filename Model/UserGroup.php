@@ -3,10 +3,12 @@
 namespace Model;
 
 
+use Model\ICrud;
 use Model\Connexion;
 use PDO;
+use PDOException;
 
-class UserGroup
+class UserGroup implements ICrud
 {
     private int $idGroup;
     private int $idUser;
@@ -49,7 +51,7 @@ class UserGroup
             $stt->bindParam(1, $this->idUser, PDO::PARAM_INT);
             $stt->bindParam(2, $this->idGroup, PDO::PARAM_INT);
             $stt->execute();
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             echo $e->getMessage();
         }
     }

@@ -2,7 +2,11 @@
 
 namespace Model;
 
-class Group
+use Model\ICrud;
+use Model\Connexion;
+use PDOException;
+
+class Group implements ICrud
 {
     const GROUP_ADMIN = 'Admin';
     const GROUP_MEMBER = 'Member';
@@ -60,7 +64,7 @@ class Group
             $stt->execute();
             $this->id = $conn->lastInsertId();
 
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             echo $e->getMessage();
         }
     }
@@ -76,7 +80,7 @@ class Group
             $stt->execute();
             $group = self::hydrate($stt->fetch());
 
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             echo $e->getMessage();
         }
         

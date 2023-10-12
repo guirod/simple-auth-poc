@@ -2,15 +2,17 @@
 
 namespace Model;
 
+use Model\ICrud;
 use Model\Connexion;
+use PDO;
+use PDOException;
 
-class User
+class User implements ICrud
 {
     private int $id;
     private string $login;
     private string $passwordHash;
     private ?array $groups = null;
-
 
 
     public function __construct()
@@ -44,7 +46,7 @@ class User
                     WHERE u.id = ?";
             
             $stt = $conn->prepare($sql);
-                $stt->bindParam(1, $this->id, \PDO::PARAM_INT);
+                $stt->bindParam(1, $this->id, PDO::PARAM_INT);
                 $stt->execute();
 
                 while ($arrayGroup = $stt->fetch()) {
@@ -108,7 +110,7 @@ class User
             $memberGroup = Group::findByName('Member');
             $userGroup = new UserGroup($this->id, $memberGroup->getId());
             $userGroup->save();
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             echo $e->getMessage();
         }
     }

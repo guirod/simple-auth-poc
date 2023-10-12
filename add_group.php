@@ -1,5 +1,5 @@
 <?php
-include_once "simple_autoload.php";
+include_once "autoload.php";
 
 use Model\Group;
 
